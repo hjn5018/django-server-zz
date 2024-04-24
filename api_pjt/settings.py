@@ -28,7 +28,11 @@ OPENAI_API_KEY = config.OPENAI_API_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '43.203.241.10',
+    'localhost',
+    '127.0.0.1',
+]
 
 
 # Application definition
