@@ -13,16 +13,27 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from drf_spectacular.utils import extend_schema
+
 
 class ArticleListAPIView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        tags=["Articles"],
+        description="Article 목록 조회를 위한 API",
+    )
     def get(self, request):
         articles = Article.objects.all()
         serializer = ArticleSerializer(articles, many=True)
         return Response(serializer.data)
 
+    @extend_schema(
+        tags=["Articles"],
+        description="Article 생성을 위한 API",
+        request=ArticleSerializer,
+    )
     def post(self, request):
         serializer = ArticleSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
@@ -32,7 +43,7 @@ class ArticleListAPIView(APIView):
 
 class ArticleDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def get_object(self, pk):
         return get_object_or_404(Article, pk=pk)
 
@@ -74,7 +85,7 @@ class CommentListAPIView(APIView):
 
 class CommentsDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def get_object(self, comment_pk):
         return get_object_or_404(Comment, pk=comment_pk)
 
@@ -90,3 +101,12 @@ class CommentsDetailAPIView(APIView):
         comment = self.get_object(comment_pk)
         comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['GET'])
+def check_sql(request):
+    comments = Comment.objects.all().prefetch_related('article')
+    for comment in comments:
+        print(comment.article.title)
+
+    return Response()
